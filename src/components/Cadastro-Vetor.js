@@ -1,39 +1,54 @@
-import React, { useState } from "react";
-import {useEffect} from "react";
+import React, { useState, useEffect } from "react";
 
 const CadastroVetor = () => {
-  // Estados para armazenar os valores dos inputs
-  const [input,setInput] = useState('');
-  const [tarefas,setTarefas] = useState([
+  const [pessoa, setPessoa] = useState(null);
+  const [input, setInput] = useState('');
+  const [tarefas, setTarefas] = useState([
     "Pagar a conta de Luz",
-    "Estudar Programacao",
-    "Enviar Tarefa"]);
+    "Estudar Programação",
+    "Enviar Tarefa"
+  ]);
 
-  useEffect(() =>{
-    localStorage.setItem('@tarefa',JSON.stringify(tarefas));
-  },[tarefas]);
-
-  const tarefasStorage = localStorage.getItem('@tarefa')
   useEffect(() => {
-    if (tarefasStorage){
-      setTarefas(JSON.parse(tarefasStorage))
+    const tarefasStorage = localStorage.getItem('@tarefa');
+    if (tarefasStorage) {
+      setTarefas(JSON.parse(tarefasStorage));
     }
-  },[]);
-  // Função que lida com o envio do formulário
-  const handleRegistro = (e) => {
-    e.preventDefault(); // Evita o recarregamento da página
+  }, []);
 
-    setTarefas([...tarefas,input])
-    setInput('')
+  useEffect(() => {
+    localStorage.setItem('@tarefa', JSON.stringify(tarefas));
+  }, [tarefas]);
+
+  useEffect(() => {
+    const pessoaStorage = localStorage.getItem('pessoa');
+    if (pessoaStorage) {
+      setPessoa(pessoaStorage);
+    } else {
+      const userName = prompt("Qual é o seu nome?");
+      if (userName) {
+        setPessoa(userName);
+        localStorage.setItem('pessoa', userName);
+      }
+    }
+  }, []);
+
+  const handleRegistro = (e) => {
+    e.preventDefault();
+    if (input.trim() === "") return;
+
+    setTarefas([...tarefas, input]);
+    setInput('');
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "20px auto", textAlign: "center" }}>
-      <h2>Cadastro Alternativo</h2>
+      <h2>{pessoa ? pessoa : "Usuário"} - Cadastro Alternativo</h2>
+      
       <form onSubmit={handleRegistro}>
         <input
           type="text"
-          placeholder="Digite uma Tarefa "
+          placeholder="Digite uma Tarefa"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           required
@@ -41,14 +56,12 @@ const CadastroVetor = () => {
         />
         <button type="submit">Registrar</button>
       </form>
-      <br></br>
 
       <ul>
-        {tarefas.map( tarefa => (
-          <li key={tarefa}>{tarefa}</li>
+        {tarefas.map((tarefa, index) => (
+          <li key={index}>{tarefa}</li>
         ))}
       </ul>
-    
     </div>
   );
 };
